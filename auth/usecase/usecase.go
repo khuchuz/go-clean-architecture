@@ -109,6 +109,17 @@ func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword,
 	return a.userRepo.UpdatePassword(ctx, username, password)
 }
 
+func (a *AuthUseCase) InitChangePassword(ctx context.Context, email string) error {
+	if email == "" {
+		return auth.ErrDataTidakLengkap
+	}
+	_, err := a.userRepo.GetUserByEmail(ctx, email)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (a *AuthUseCase) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &AuthClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

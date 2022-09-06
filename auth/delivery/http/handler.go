@@ -17,6 +17,10 @@ func NewHandler(useCase auth.UseCase) *Handler {
 	}
 }
 
+type initChangePasswordInput struct {
+	Email string `json:"email"`
+}
+
 type signInput struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -88,6 +92,27 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 	}
 
 	err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
+	if err != nil {
+		if err == auth.ErrUserNotFound {
+			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
+			return
+		}
+		c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUnknown.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, signResponse{Message: "Password berhasil diubah"})
+}
+
+func (h *Handler) InitChangePassword(c *gin.Context) {
+	inp := new(initChangePasswordInput)
+
+	if err := c.BindJSON(inp); err != nil {
+		c.JSON(http.StatusBadRequest, signResponse{Message: auth.ErrBadRequest.Error()})
+		return
+	}
+
+	err := h.useCase.InitChangePassword(c.Request.Context(), inp.Email)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
