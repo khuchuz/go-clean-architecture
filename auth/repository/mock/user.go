@@ -2,7 +2,6 @@ package mock
 
 import (
 	"context"
-
 	"github.com/stretchr/testify/mock"
 	"github.com/khuchuz/go-clean-architecture/models"
 )
@@ -19,12 +18,6 @@ func (s *UserStorageMock) CreateUser(ctx context.Context, user *models.User) err
 
 func (s *UserStorageMock) GetUser(ctx context.Context, username, password string) (*models.User, error) {
 	args := s.Called(username, password)
-
-	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (s *UserStorageMock) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
-	args := s.Called(username)
 
 	return args.Get(0).(*models.User), args.Error(1)
 }

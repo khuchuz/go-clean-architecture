@@ -37,18 +37,19 @@ func NewAuthUseCase(
 	}
 }
 
-func (a *AuthUseCase) SignUp(ctx context.Context, username, password string) error {
+func (a *AuthUseCase) SignUp(ctx context.Context, username, email, password string) error {
 	pwd := sha1.New()
 	pwd.Write([]byte(password))
 	pwd.Write([]byte(a.hashSalt))
 
-	_, err := a.userRepo.GetUserByUsername(ctx, username)
-	if err == nil {
+	cekUser, _ := a.userRepo.GetUserByUsername(ctx, username)
+	if cekUser != nil {
 		return auth.ErrUserDuplicate
 	}
 
 	user := &models.User{
 		Username: username,
+		Email:    email,
 		Password: fmt.Sprintf("%x", pwd.Sum(nil)),
 	}
 

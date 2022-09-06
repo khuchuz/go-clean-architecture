@@ -41,7 +41,7 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	if err := h.useCase.SignUp(c.Request.Context(), inp.Username, inp.Email, inp.Password); err != nil {
-		c.JSON(http.StatusInternalServerError, signResponse{Message: auth.ErrUnknown.Error()})
+		c.JSON(http.StatusInternalServerError, signResponse{Message: err.Error()})
 		return
 	}
 

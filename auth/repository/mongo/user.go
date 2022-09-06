@@ -28,7 +28,6 @@ func NewUserRepository(db *mongo.Database, collection string) *UserRepository {
 
 func (r UserRepository) CreateUser(ctx context.Context, user *models.User) error {
 	model := toMongoUser(user)
-
 	res, err := r.db.InsertOne(ctx, model)
 	if err != nil {
 		return err

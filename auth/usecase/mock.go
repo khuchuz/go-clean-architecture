@@ -2,16 +2,17 @@ package usecase
 
 import (
 	"context"
-	"github.com/stretchr/testify/mock"
+
 	"github.com/khuchuz/go-clean-architecture/models"
+	"github.com/stretchr/testify/mock"
 )
 
 type AuthUseCaseMock struct {
 	mock.Mock
 }
 
-func (m *AuthUseCaseMock) SignUp(ctx context.Context, username, password string) error {
-	args := m.Called(username, password)
+func (m *AuthUseCaseMock) SignUp(ctx context.Context, username, email, password string) error {
+	args := m.Called(username, email, password)
 
 	return args.Error(0)
 }

@@ -2,10 +2,9 @@ package localstorage
 
 import (
 	"context"
-	"sync"
-
 	"github.com/khuchuz/go-clean-architecture/auth"
 	"github.com/khuchuz/go-clean-architecture/models"
+	"sync"
 )
 
 type UserLocalStorage struct {
@@ -34,19 +33,6 @@ func (s *UserLocalStorage) GetUser(ctx context.Context, username, password strin
 
 	for _, user := range s.users {
 		if user.Username == username && user.Password == password {
-			return user, nil
-		}
-	}
-
-	return nil, auth.ErrUserNotFound
-}
-
-func (s *UserLocalStorage) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
-	s.mutex.Lock()
-	defer s.mutex.Unlock()
-
-	for _, user := range s.users {
-		if user.Username == username {
 			return user, nil
 		}
 	}
