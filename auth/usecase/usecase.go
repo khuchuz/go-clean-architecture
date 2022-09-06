@@ -41,10 +41,16 @@ func (a *AuthUseCase) SignUp(ctx context.Context, username, email, password stri
 	pwd := sha1.New()
 	pwd.Write([]byte(password))
 	pwd.Write([]byte(a.hashSalt))
+	if username == "" || email == "" || password == "" {
+		return auth.ErrDataTidakLengkap
+	}
 
-	cekUser, _ := a.userRepo.GetUserByUsername(ctx, username)
-	if cekUser != nil {
+	if cekUser, _ := a.userRepo.GetUserByUsername(ctx, username); cekUser != nil {
 		return auth.ErrUserDuplicate
+	}
+
+	if cekUser, _ := a.userRepo.GetUserByEmail(ctx, email); cekUser != nil {
+		return auth.ErrEmailDuplicate
 	}
 
 	user := &models.User{

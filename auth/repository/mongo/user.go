@@ -64,6 +64,19 @@ func (r UserRepository) GetUserByUsername(ctx context.Context, username string) 
 	return toModel(user), nil
 }
 
+func (r UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+	user := new(User)
+	err := r.db.FindOne(ctx, bson.M{
+		"email": email,
+	}).Decode(user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return toModel(user), nil
+}
+
 func toMongoUser(u *models.User) *User {
 	return &User{
 		Username: u.Username,
