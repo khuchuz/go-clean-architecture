@@ -85,27 +85,22 @@ func (a *AuthUseCase) SignIn(ctx context.Context, username, password string) (st
 	return token.SignedString(a.signingKey)
 }
 
-func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword, password string) (string, error) {
+func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword, password string) error {
 	pwd := sha1.New()
-	pwd.Write([]byte(password))
+	pwd.Write([]byte(oldpassword))
 	pwd.Write([]byte(a.hashSalt))
-	password = fmt.Sprintf("%x", pwd.Sum(nil))
+	oldpassword = fmt.Sprintf("%x", pwd.Sum(nil))
 
-	user, err := a.userRepo.GetUser(ctx, username, password)
+	pwd2 := sha1.New()
+	pwd2.Write([]byte(password))
+	pwd2.Write([]byte(a.hashSalt))
+	password = fmt.Sprintf("%x", pwd2.Sum(nil))
+
+	_, err := a.userRepo.GetUser(ctx, username, oldpassword)
 	if err != nil {
-		return "", auth.ErrUserNotFound
+		return auth.ErrUserNotFound
 	}
-
-	claims := AuthClaims{
-		User: user,
-		StandardClaims: jwt.StandardClaims{
-			ExpiresAt: jwt.At(time.Now().Add(a.expireDuration)),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-	return token.SignedString(a.signingKey)
+	return a.userRepo.UpdatePassword(ctx, username, password)
 }
 
 func (a *AuthUseCase) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {

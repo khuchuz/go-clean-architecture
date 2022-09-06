@@ -11,6 +11,6 @@ const CtxUserKey = "user"
 type UseCase interface {
 	SignUp(ctx context.Context, username, email, password string) error
 	SignIn(ctx context.Context, username, password string) (string, error)
-	ChangePassword(ctx context.Context, username, oldpassword, password string) (string, error)
+	ChangePassword(ctx context.Context, username, oldpassword, password string) error
 	ParseToken(ctx context.Context, accessToken string) (*models.User, error)
 }

@@ -87,7 +87,7 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	_, err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
+	err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
