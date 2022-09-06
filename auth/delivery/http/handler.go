@@ -87,7 +87,7 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	token, err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
+	_, err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
@@ -97,5 +97,5 @@ func (h *Handler) ChangePassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, signInResponse{Token: token})
+	c.JSON(http.StatusOK, signResponse{Message: "Password berhasil diubah"})
 }

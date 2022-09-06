@@ -52,16 +52,14 @@ func (r UserRepository) GetUser(ctx context.Context, username, password string) 
 }
 
 func (r UserRepository) UpdatePassword(ctx context.Context, username, password string) error {
-	user := new(User)
-	err := r.db.FindOne(ctx, bson.M{
-		"username": username,
-		"password": password,
-	}).Decode(user)
-
+	_, err := r.db.UpdateOne(ctx,
+		bson.M{"username": username},
+		bson.D{
+			{"$set", bson.D{{"password", password}}},
+		})
 	if err != nil {
 		return err
 	}
-
 	return nil
 }
 
