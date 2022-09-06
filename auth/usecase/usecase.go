@@ -86,6 +86,12 @@ func (a *AuthUseCase) SignIn(ctx context.Context, username, password string) (st
 }
 
 func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword, password string) error {
+	if username == "" || oldpassword == "" || password == "" {
+		return auth.ErrDataTidakLengkap
+	}
+	if oldpassword == password {
+		return auth.ErrPasswordSame
+	}
 	pwd := sha1.New()
 	pwd.Write([]byte(oldpassword))
 	pwd.Write([]byte(a.hashSalt))

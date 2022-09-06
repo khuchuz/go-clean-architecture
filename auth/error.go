@@ -11,4 +11,5 @@ var (
 	ErrBadRequest         = errors.New("bad request bro")
 	ErrUnauthorized       = errors.New("user unauthorized")
 	ErrDataTidakLengkap   = errors.New("data tidak lengkap")
+	ErrPasswordSame       = errors.New("data tidak lengkap")
 )
