@@ -85,6 +85,29 @@ func (a *AuthUseCase) SignIn(ctx context.Context, username, password string) (st
 	return token.SignedString(a.signingKey)
 }
 
+func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword, password string) (string, error) {
+	pwd := sha1.New()
+	pwd.Write([]byte(password))
+	pwd.Write([]byte(a.hashSalt))
+	password = fmt.Sprintf("%x", pwd.Sum(nil))
+
+	user, err := a.userRepo.GetUser(ctx, username, password)
+	if err != nil {
+		return "", auth.ErrUserNotFound
+	}
+
+	claims := AuthClaims{
+		User: user,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: jwt.At(time.Now().Add(a.expireDuration)),
+		},
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	return token.SignedString(a.signingKey)
+}
+
 func (a *AuthUseCase) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {
 	token, err := jwt.ParseWithClaims(accessToken, &AuthClaims{}, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {

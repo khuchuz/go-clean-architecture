@@ -22,6 +22,12 @@ type signInput struct {
 	Password string `json:"password"`
 }
 
+type changePasswordInput struct {
+	Username    string `json:"username"`
+	OldPassword string `json:"oldpassword"`
+	Password    string `json:"password"`
+}
+
 type signUpInput struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
@@ -61,6 +67,27 @@ func (h *Handler) SignIn(c *gin.Context) {
 	}
 
 	token, err := h.useCase.SignIn(c.Request.Context(), inp.Username, inp.Password)
+	if err != nil {
+		if err == auth.ErrUserNotFound {
+			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
+			return
+		}
+		c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUnknown.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, signInResponse{Token: token})
+}
+
+func (h *Handler) ChangePassword(c *gin.Context) {
+	inp := new(changePasswordInput)
+
+	if err := c.BindJSON(inp); err != nil {
+		c.JSON(http.StatusBadRequest, signResponse{Message: auth.ErrBadRequest.Error()})
+		return
+	}
+
+	token, err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
