@@ -16,11 +16,11 @@ import (
 	"github.com/khuchuz/go-clean-architecture/auth"
 	"github.com/khuchuz/go-clean-architecture/bookmark"
 
-	authhttp "github.com/khuchuz/go-clean-architecture/auth/delivery/http"
-	authmongo "github.com/khuchuz/go-clean-architecture/auth/repository/mongo"
+	authhttp "github.com/khuchuz/go-clean-architecture/auth/delivery"
+	authmongo "github.com/khuchuz/go-clean-architecture/auth/repository"
 	authusecase "github.com/khuchuz/go-clean-architecture/auth/usecase"
-	bmhttp "github.com/khuchuz/go-clean-architecture/bookmark/delivery/http"
-	bmmongo "github.com/khuchuz/go-clean-architecture/bookmark/repository/mongo"
+	bmhttp "github.com/khuchuz/go-clean-architecture/bookmark/delivery"
+	bmmongo "github.com/khuchuz/go-clean-architecture/bookmark/repository"
 	bmusecase "github.com/khuchuz/go-clean-architecture/bookmark/usecase"
 )
 

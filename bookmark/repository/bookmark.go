@@ -1,7 +1,8 @@
-package mongo
+package repository
 
 import (
 	"context"
+
 	"github.com/khuchuz/go-clean-architecture/models"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"

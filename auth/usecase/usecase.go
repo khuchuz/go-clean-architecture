@@ -45,13 +45,13 @@ func (a *AuthUseCase) SignUp(ctx context.Context, username, email, password stri
 		return auth.ErrDataTidakLengkap
 	}
 
-	if cekUser, _ := a.userRepo.GetUserByUsername(ctx, username); cekUser != nil {
-		return auth.ErrUserDuplicate
-	}
+	//if cekUser, _ := a.userRepo.GetUserByUsername(ctx, username); cekUser != nil {
+	//	return auth.ErrUserDuplicate
+	//}
 
-	if cekUser, _ := a.userRepo.GetUserByEmail(ctx, email); cekUser != nil {
-		return auth.ErrEmailDuplicate
-	}
+	//if cekUser, _ := a.userRepo.GetUserByEmail(ctx, email); cekUser != nil {
+	//	return auth.ErrEmailDuplicate
+	//}
 
 	user := &models.User{
 		Username: username,
@@ -107,17 +107,6 @@ func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword,
 		return auth.ErrUserNotFound
 	}
 	return a.userRepo.UpdatePassword(ctx, username, password)
-}
-
-func (a *AuthUseCase) InitChangePassword(ctx context.Context, email string) error {
-	if email == "" {
-		return auth.ErrDataTidakLengkap
-	}
-	_, err := a.userRepo.GetUserByEmail(ctx, email)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func (a *AuthUseCase) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {
