@@ -17,27 +17,6 @@ func NewHandler(useCase auth.UseCase) *Handler {
 	}
 }
 
-type signInput struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-type changePasswordInput struct {
-	Username    string `json:"username"`
-	OldPassword string `json:"oldpassword"`
-	Password    string `json:"password"`
-}
-
-type signUpInput struct {
-	Username string `json:"username"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
-type signResponse struct {
-	Message string `json:"message"`
-}
-
 func (h *Handler) SignUp(c *gin.Context) {
 	inp := new(signUpInput)
 
@@ -52,10 +31,6 @@ func (h *Handler) SignUp(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, signResponse{Message: "Sign Up Berhasil"})
-}
-
-type signInResponse struct {
-	Token string `json:"token"`
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
