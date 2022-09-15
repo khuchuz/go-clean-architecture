@@ -16,11 +16,3 @@ type SignUpInput struct {
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
-
-type SignResponse struct {
-	Message string `json:"message"`
-}
-
-type SignInResponse struct {
-	Token string `json:"token"`
-}
