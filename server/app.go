@@ -13,10 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/khuchuz/go-clean-architecture/auth"
 	"github.com/khuchuz/go-clean-architecture/bookmark"
 
 	authhttp "github.com/khuchuz/go-clean-architecture/auth/delivery"
+	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 	authmongo "github.com/khuchuz/go-clean-architecture/auth/repository"
 	authusecase "github.com/khuchuz/go-clean-architecture/auth/usecase"
 	bmhttp "github.com/khuchuz/go-clean-architecture/bookmark/delivery"
@@ -28,7 +28,7 @@ type App struct {
 	httpServer *http.Server
 
 	bookmarkUC bookmark.UseCase
-	authUC     auth.UseCase
+	authUC     itface.UseCase
 }
 
 func NewApp() *App {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/khuchuz/go-clean-architecture/auth/entities"
 	"github.com/khuchuz/go-clean-architecture/auth/repository/mock"
 	"github.com/khuchuz/go-clean-architecture/models"
 	"github.com/stretchr/testify/assert"
@@ -15,9 +16,10 @@ func TestAuthFlow(t *testing.T) {
 	uc := NewAuthUseCase(repo, "salt", []byte("secret"), 86400)
 
 	var (
-		username = "usermock"
-		email    = "usermock@gmail.com"
-		password = "pass"
+		username    = "usermock"
+		email       = "usermock@gmail.com"
+		oldpassword = "passold"
+		password    = "pass"
 
 		ctx = context.Background()
 
@@ -30,12 +32,18 @@ func TestAuthFlow(t *testing.T) {
 
 	// Sign Up
 	repo.On("CreateUser", user).Return(nil)
-	err := uc.SignUp(ctx, username, email, password)
+	err := uc.SignUp(ctx, entities.SignUpInput{Username: username, Email: email, Password: password})
 	assert.NoError(t, err)
 
 	// Sign In (Get Auth Token)
 	repo.On("GetUser", user.Username, user.Password).Return(user, nil)
-	token, err := uc.SignIn(ctx, username, password)
+	token, err := uc.SignIn(ctx, entities.SignInput{Username: username, Password: password})
+	assert.NoError(t, err)
+	assert.NotEmpty(t, token)
+
+	// Change Password
+	repo.On("UpdatePassword", user.Username, user.Password).Return(user, nil)
+	err = uc.ChangePassword(ctx, entities.ChangePasswordInput{Username: username, Password: password, OldPassword: oldpassword})
 	assert.NoError(t, err)
 	assert.NotEmpty(t, token)
 

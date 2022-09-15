@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/khuchuz/go-clean-architecture/auth"
+	IAuth "github.com/khuchuz/go-clean-architecture/auth/itface"
 	"github.com/khuchuz/go-clean-architecture/bookmark"
 	"github.com/khuchuz/go-clean-architecture/models"
 )
@@ -37,7 +37,7 @@ func (h *Handler) Create(c *gin.Context) {
 		return
 	}
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(IAuth.CtxUserKey).(*models.User)
 
 	if err := h.useCase.CreateBookmark(c.Request.Context(), user, inp.URL, inp.Title); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)
@@ -52,7 +52,7 @@ type getResponse struct {
 }
 
 func (h *Handler) Get(c *gin.Context) {
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(IAuth.CtxUserKey).(*models.User)
 
 	bms, err := h.useCase.GetBookmarks(c.Request.Context(), user)
 	if err != nil {
@@ -76,7 +76,7 @@ func (h *Handler) Delete(c *gin.Context) {
 		return
 	}
 
-	user := c.MustGet(auth.CtxUserKey).(*models.User)
+	user := c.MustGet(IAuth.CtxUserKey).(*models.User)
 
 	if err := h.useCase.DeleteBookmark(c.Request.Context(), user, inp.ID); err != nil {
 		c.AbortWithStatus(http.StatusInternalServerError)

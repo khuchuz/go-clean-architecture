@@ -6,13 +6,14 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/khuchuz/go-clean-architecture/auth"
+	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 )
 
 type AuthMiddleware struct {
-	usecase auth.UseCase
+	usecase itface.UseCase
 }
 
-func NewAuthMiddleware(usecase auth.UseCase) gin.HandlerFunc {
+func NewAuthMiddleware(usecase itface.UseCase) gin.HandlerFunc {
 	return (&AuthMiddleware{
 		usecase: usecase,
 	}).Handle
@@ -47,5 +48,5 @@ func (m *AuthMiddleware) Handle(c *gin.Context) {
 		return
 	}
 
-	c.Set(auth.CtxUserKey, user)
+	c.Set(itface.CtxUserKey, user)
 }

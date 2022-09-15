@@ -10,6 +10,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/khuchuz/go-clean-architecture/auth"
+	"github.com/khuchuz/go-clean-architecture/auth/entities"
+	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 )
 
 type AuthClaims struct {
@@ -18,14 +20,14 @@ type AuthClaims struct {
 }
 
 type AuthUseCase struct {
-	userRepo       auth.UserRepository
+	userRepo       itface.UserRepository
 	hashSalt       string
 	signingKey     []byte
 	expireDuration time.Duration
 }
 
 func NewAuthUseCase(
-	userRepo auth.UserRepository,
+	userRepo itface.UserRepository,
 	hashSalt string,
 	signingKey []byte,
 	tokenTTLSeconds time.Duration) *AuthUseCase {
@@ -37,38 +39,38 @@ func NewAuthUseCase(
 	}
 }
 
-func (a *AuthUseCase) SignUp(ctx context.Context, username, email, password string) error {
+func (a *AuthUseCase) SignUp(ctx context.Context, inp entities.SignUpInput) error {
 	pwd := sha1.New()
-	pwd.Write([]byte(password))
+	pwd.Write([]byte(inp.Password))
 	pwd.Write([]byte(a.hashSalt))
-	if username == "" || email == "" || password == "" {
+	if inp.Username == "" || inp.Email == "" || inp.Password == "" {
 		return auth.ErrDataTidakLengkap
 	}
 
-	//if cekUser, _ := a.userRepo.GetUserByUsername(ctx, username); cekUser != nil {
+	//if cekUser, _ := a.userRepo.GetUserByUsername(ctx, inp.Username); cekUser != nil {
 	//	return auth.ErrUserDuplicate
 	//}
 
-	//if cekUser, _ := a.userRepo.GetUserByEmail(ctx, email); cekUser != nil {
+	//if cekUser, _ := a.userRepo.GetUserByEmail(ctx, inp.Email); cekUser != nil {
 	//	return auth.ErrEmailDuplicate
 	//}
 
 	user := &models.User{
-		Username: username,
-		Email:    email,
+		Username: inp.Username,
+		Email:    inp.Email,
 		Password: fmt.Sprintf("%x", pwd.Sum(nil)),
 	}
 
 	return a.userRepo.CreateUser(ctx, user)
 }
 
-func (a *AuthUseCase) SignIn(ctx context.Context, username, password string) (string, error) {
+func (a *AuthUseCase) SignIn(ctx context.Context, inp entities.SignInput) (string, error) {
 	pwd := sha1.New()
-	pwd.Write([]byte(password))
+	pwd.Write([]byte(inp.Password))
 	pwd.Write([]byte(a.hashSalt))
-	password = fmt.Sprintf("%x", pwd.Sum(nil))
+	password := fmt.Sprintf("%x", pwd.Sum(nil))
 
-	user, err := a.userRepo.GetUser(ctx, username, password)
+	user, err := a.userRepo.GetUser(ctx, inp.Username, password)
 	if err != nil {
 		return "", auth.ErrUserNotFound
 	}
@@ -85,28 +87,28 @@ func (a *AuthUseCase) SignIn(ctx context.Context, username, password string) (st
 	return token.SignedString(a.signingKey)
 }
 
-func (a *AuthUseCase) ChangePassword(ctx context.Context, username, oldpassword, password string) error {
-	if username == "" || oldpassword == "" || password == "" {
+func (a *AuthUseCase) ChangePassword(ctx context.Context, inp entities.ChangePasswordInput) error {
+	if inp.Username == "" || inp.OldPassword == "" || inp.Password == "" {
 		return auth.ErrDataTidakLengkap
 	}
-	if oldpassword == password {
+	if inp.OldPassword == inp.Password {
 		return auth.ErrPasswordSame
 	}
 	pwd := sha1.New()
-	pwd.Write([]byte(oldpassword))
+	pwd.Write([]byte(inp.OldPassword))
 	pwd.Write([]byte(a.hashSalt))
-	oldpassword = fmt.Sprintf("%x", pwd.Sum(nil))
+	oldpassword := fmt.Sprintf("%x", pwd.Sum(nil))
 
 	pwd2 := sha1.New()
-	pwd2.Write([]byte(password))
+	pwd2.Write([]byte(inp.Password))
 	pwd2.Write([]byte(a.hashSalt))
-	password = fmt.Sprintf("%x", pwd2.Sum(nil))
+	password := fmt.Sprintf("%x", pwd2.Sum(nil))
 
-	_, err := a.userRepo.GetUser(ctx, username, oldpassword)
+	_, err := a.userRepo.GetUser(ctx, inp.Username, oldpassword)
 	if err != nil {
 		return auth.ErrUserNotFound
 	}
-	return a.userRepo.UpdatePassword(ctx, username, password)
+	return a.userRepo.UpdatePassword(ctx, inp.Username, password)
 }
 
 func (a *AuthUseCase) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {

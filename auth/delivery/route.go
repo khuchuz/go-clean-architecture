@@ -2,10 +2,10 @@ package delivery
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/khuchuz/go-clean-architecture/auth"
+	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 )
 
-func RegisterHTTPEndpoints(router *gin.Engine, uc auth.UseCase) {
+func RegisterHTTPEndpoints(router *gin.Engine, uc itface.UseCase) {
 	h := NewHandler(uc)
 
 	authEndpoints := router.Group("/auth")

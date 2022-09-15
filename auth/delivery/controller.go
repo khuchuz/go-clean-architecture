@@ -5,27 +5,29 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/khuchuz/go-clean-architecture/auth"
+	"github.com/khuchuz/go-clean-architecture/auth/entities"
+	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 )
 
 type Handler struct {
-	useCase auth.UseCase
+	useCase itface.UseCase
 }
 
-func NewHandler(useCase auth.UseCase) *Handler {
+func NewHandler(useCase itface.UseCase) *Handler {
 	return &Handler{
 		useCase: useCase,
 	}
 }
 
 func (h *Handler) SignUp(c *gin.Context) {
-	inp := new(signUpInput)
+	inp := new(entities.SignUpInput)
 
 	if err := c.BindJSON(inp); err != nil {
 		c.JSON(http.StatusBadRequest, signResponse{Message: auth.ErrBadRequest.Error()})
 		return
 	}
 
-	if err := h.useCase.SignUp(c.Request.Context(), inp.Username, inp.Email, inp.Password); err != nil {
+	if err := h.useCase.SignUp(c.Request.Context(), *inp); err != nil {
 		c.JSON(http.StatusInternalServerError, signResponse{Message: err.Error()})
 		return
 	}
@@ -34,14 +36,14 @@ func (h *Handler) SignUp(c *gin.Context) {
 }
 
 func (h *Handler) SignIn(c *gin.Context) {
-	inp := new(signInput)
+	inp := new(entities.SignInput)
 
 	if err := c.BindJSON(inp); err != nil {
 		c.JSON(http.StatusBadRequest, signResponse{Message: auth.ErrBadRequest.Error()})
 		return
 	}
 
-	token, err := h.useCase.SignIn(c.Request.Context(), inp.Username, inp.Password)
+	token, err := h.useCase.SignIn(c.Request.Context(), *inp)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
@@ -55,14 +57,14 @@ func (h *Handler) SignIn(c *gin.Context) {
 }
 
 func (h *Handler) ChangePassword(c *gin.Context) {
-	inp := new(changePasswordInput)
+	inp := new(entities.ChangePasswordInput)
 
 	if err := c.BindJSON(inp); err != nil {
 		c.JSON(http.StatusBadRequest, signResponse{Message: auth.ErrBadRequest.Error()})
 		return
 	}
 
-	err := h.useCase.ChangePassword(c.Request.Context(), inp.Username, inp.OldPassword, inp.Password)
+	err := h.useCase.ChangePassword(c.Request.Context(), *inp)
 	if err != nil {
 		if err == auth.ErrUserNotFound {
 			c.JSON(http.StatusUnauthorized, signResponse{Message: auth.ErrUserNotFound.Error()})
