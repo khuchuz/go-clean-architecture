@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
@@ -34,16 +33,16 @@ type App struct {
 func NewApp() *App {
 	db := initDB()
 
-	userRepo := authmongo.NewUserRepository(db, viper.GetString("mongo.user_collection"))
-	bookmarkRepo := bmmongo.NewBookmarkRepository(db, viper.GetString("mongo.bookmark_collection"))
+	userRepo := authmongo.NewUserRepository(db, "users")
+	bookmarkRepo := bmmongo.NewBookmarkRepository(db, "bookmarks")
 
 	return &App{
 		bookmarkUC: bmusecase.NewBookmarkUseCase(bookmarkRepo),
 		authUC: authusecase.NewAuthUseCase(
 			userRepo,
-			viper.GetString("auth.hash_salt"),
-			[]byte(viper.GetString("auth.signing_key")),
-			viper.GetDuration("auth.token_ttl"),
+			"hash_salt",
+			[]byte("signing_key"),
+			86400,
 		),
 	}
 }
@@ -93,7 +92,7 @@ func (a *App) Run(port string) error {
 }
 
 func initDB() *mongo.Database {
-	client, err := mongo.NewClient(options.Client().ApplyURI(viper.GetString("mongo.uri")))
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatalf("Error occured while establishing connection to mongoDB")
 	}
@@ -111,5 +110,5 @@ func initDB() *mongo.Database {
 		log.Fatal(err)
 	}
 
-	return client.Database(viper.GetString("mongo.name"))
+	return client.Database("testdb")
 }
