@@ -47,13 +47,13 @@ func (a *AuthUseCase) SignUp(ctx context.Context, inp entities.SignUpInput) erro
 		return auth.ErrDataTidakLengkap
 	}
 
-	//if cekUser, _ := a.userRepo.GetUserByUsername(ctx, inp.Username); cekUser != nil {
-	//	return auth.ErrUserDuplicate
-	//}
+	if a.userRepo.IsUserExistByUsername(ctx, inp.Username) {
+		return auth.ErrUserDuplicate
+	}
 
-	//if cekUser, _ := a.userRepo.GetUserByEmail(ctx, inp.Email); cekUser != nil {
-	//	return auth.ErrEmailDuplicate
-	//}
+	if a.userRepo.IsUserExistByEmail(ctx, inp.Email) {
+		return auth.ErrEmailDuplicate
+	}
 
 	user := &models.User{
 		Username: inp.Username,

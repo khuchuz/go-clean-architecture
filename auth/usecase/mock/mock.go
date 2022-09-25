@@ -26,17 +26,17 @@ func (s *UserStorageMock) GetUser(ctx context.Context, username, password string
 func (s *UserStorageMock) UpdatePassword(ctx context.Context, username, password string) error {
 	args := s.Called(username, password)
 
-	return args.Error(1)
+	return args.Error(0)
 }
 
-func (s *UserStorageMock) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (s *UserStorageMock) IsUserExistByUsername(ctx context.Context, username string) bool {
 	args := s.Called(username)
 
-	return args.Get(0).(*models.User), args.Error(1)
+	return args.Bool(0)
 }
 
-func (s *UserStorageMock) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (s *UserStorageMock) IsUserExistByEmail(ctx context.Context, email string) bool {
 	args := s.Called(email)
 
-	return args.Get(0).(*models.User), args.Error(1)
+	return args.Bool(0)
 }

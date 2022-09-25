@@ -63,30 +63,28 @@ func (r UserRepository) UpdatePassword(ctx context.Context, username, password s
 	return nil
 }
 
-func (r UserRepository) GetUserByUsername(ctx context.Context, username string) (*models.User, error) {
+func (r UserRepository) IsUserExistByUsername(ctx context.Context, username string) bool {
 	user := new(User)
 	err := r.db.FindOne(ctx, bson.M{
 		"username": username,
 	}).Decode(user)
 
 	if err != nil {
-		return nil, err
+		return false
 	}
-
-	return toModel(user), nil
+	return true
 }
 
-func (r UserRepository) GetUserByEmail(ctx context.Context, email string) (*models.User, error) {
+func (r UserRepository) IsUserExistByEmail(ctx context.Context, email string) bool {
 	user := new(User)
 	err := r.db.FindOne(ctx, bson.M{
 		"email": email,
 	}).Decode(user)
 
 	if err != nil {
-		return nil, err
+		return false
 	}
-
-	return toModel(user), nil
+	return true
 }
 
 func toMongoUser(u *models.User) *User {
