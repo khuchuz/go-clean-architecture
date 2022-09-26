@@ -132,6 +132,56 @@ func TestSignIn_ErrUnknown(t *testing.T) {
 	assert.Equal(t, "{\"message\":\"unknown error\"}", w.Body.String())
 }
 
+func TestChangePassword_ErrUserNotFound(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	RegisterHTTPEndpoints(r, uc)
+
+	changePassBody := &entities.ChangePasswordInput{
+		Username:    "testuser",
+		Password:    "newpass",
+		OldPassword: "testpass",
+	}
+
+	body, err := json.Marshal(changePassBody)
+	assert.NoError(t, err)
+
+	uc.On("ChangePassword", changePassBody.Username, changePassBody.OldPassword, changePassBody.Password).Return(auth.ErrUserNotFound)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/change-pass", bytes.NewBuffer(body))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 401, w.Code)
+	assert.Equal(t, "{\"message\":\"user not found\"}", w.Body.String())
+}
+
+func TestChangePassword_ErrUnknown(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	RegisterHTTPEndpoints(r, uc)
+
+	changePassBody := &entities.ChangePasswordInput{
+		Username:    "testuser",
+		Password:    "newpass",
+		OldPassword: "testpass",
+	}
+
+	body, err := json.Marshal(changePassBody)
+	assert.NoError(t, err)
+
+	uc.On("ChangePassword", changePassBody.Username, changePassBody.OldPassword, changePassBody.Password).Return(auth.ErrUnauthorized)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/change-pass", bytes.NewBuffer(body))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 401, w.Code)
+	assert.Equal(t, "{\"message\":\"unknown error\"}", w.Body.String())
+}
+
 func TestChangePassword_Success(t *testing.T) {
 	r := gin.Default()
 	uc := new(mock.AuthUseCaseMock)
@@ -147,12 +197,12 @@ func TestChangePassword_Success(t *testing.T) {
 	body, err := json.Marshal(changePassBody)
 	assert.NoError(t, err)
 
-	uc.On("ChangePassword", changePassBody.Username, changePassBody.OldPassword, changePassBody.Password).Return("", auth.ErrUnauthorized)
+	uc.On("ChangePassword", changePassBody.Username, changePassBody.OldPassword, changePassBody.Password).Return(nil)
 
 	w := httptest.NewRecorder()
 	req, _ := http.NewRequest("POST", "/auth/change-pass", bytes.NewBuffer(body))
 	r.ServeHTTP(w, req)
 
-	assert.Equal(t, 401, w.Code)
-	assert.Equal(t, "{\"message\":\"unknown error\"}", w.Body.String())
+	assert.Equal(t, 200, w.Code)
+	assert.Equal(t, "{\"message\":\"Password berhasil diubah\"}", w.Body.String())
 }
