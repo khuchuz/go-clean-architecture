@@ -6,7 +6,7 @@ import (
 
 	"github.com/khuchuz/go-clean-architecture/auth"
 	"github.com/khuchuz/go-clean-architecture/auth/entities"
-	"github.com/khuchuz/go-clean-architecture/auth/usecase/mock"
+	"github.com/khuchuz/go-clean-architecture/auth/repository/mock"
 	"github.com/khuchuz/go-clean-architecture/models"
 	"github.com/stretchr/testify/assert"
 )
@@ -104,7 +104,6 @@ func Test_SignUp_Failed_EmptyUsername(t *testing.T) {
 	// Sign Up
 	repo.On("CreateUser", user).Return(nil)
 	err := uc.SignUp(ctx, entities.SignUpInput{Username: username, Email: email, Password: password})
-	//assert.NoError(t, err)
 	assert.Error(t, err, auth.ErrDataTidakLengkap)
 }
 
@@ -128,7 +127,6 @@ func Test_SignUp_Failed_EmptyEmail(t *testing.T) {
 	// Sign Up
 	repo.On("CreateUser", user).Return(nil)
 	err := uc.SignUp(ctx, entities.SignUpInput{Username: username, Email: email, Password: password})
-	//assert.NoError(t, err)
 	assert.Error(t, err, auth.ErrDataTidakLengkap)
 }
 
@@ -152,7 +150,6 @@ func Test_SignUp_Failed_Password(t *testing.T) {
 	// Sign Up
 	repo.On("CreateUser", user).Return(nil)
 	err := uc.SignUp(ctx, entities.SignUpInput{Username: username, Email: email, Password: password})
-	//assert.NoError(t, err)
 	assert.Error(t, err, auth.ErrDataTidakLengkap)
 }
 

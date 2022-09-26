@@ -56,14 +56,7 @@ func (a *App) Run(port string) error {
 	)
 
 	// Set up http handlers
-	h := authhttp.NewHandler(a.authUC)
-
-	authEndpoints := router.Group("/auth")
-	{
-		authEndpoints.POST("/sign-up", h.SignUp)
-		authEndpoints.POST("/sign-in", h.SignIn)
-		authEndpoints.POST("/change-pass", h.ChangePassword)
-	}
+	authhttp.RegisterHTTPEndpoints(router, a.authUC)
 
 	// API endpoints
 	authMiddleware := authhttp.NewAuthMiddleware(a.authUC)

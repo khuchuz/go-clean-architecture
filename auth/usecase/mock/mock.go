@@ -3,40 +3,35 @@ package mock
 import (
 	"context"
 
+	"github.com/khuchuz/go-clean-architecture/auth/entities"
 	"github.com/khuchuz/go-clean-architecture/models"
 	"github.com/stretchr/testify/mock"
 )
 
-type UserStorageMock struct {
+type AuthUseCaseMock struct {
 	mock.Mock
 }
 
-func (s *UserStorageMock) CreateUser(ctx context.Context, user *models.User) error {
-	args := s.Called(user)
+func (m *AuthUseCaseMock) SignUp(ctx context.Context, inp entities.SignUpInput) error {
+	args := m.Called(inp.Username, inp.Email, inp.Password)
 
 	return args.Error(0)
 }
 
-func (s *UserStorageMock) GetUser(ctx context.Context, username, password string) (*models.User, error) {
-	args := s.Called(username, password)
+func (m *AuthUseCaseMock) SignIn(ctx context.Context, inp entities.SignInput) (string, error) {
+	args := m.Called(inp.Username, inp.Password)
+
+	return args.Get(0).(string), args.Error(1)
+}
+
+func (m *AuthUseCaseMock) ChangePassword(ctx context.Context, inp entities.ChangePasswordInput) error {
+	args := m.Called(inp.Username, inp.OldPassword, inp.Password)
+
+	return args.Error(1)
+}
+
+func (m *AuthUseCaseMock) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {
+	args := m.Called(accessToken)
 
 	return args.Get(0).(*models.User), args.Error(1)
-}
-
-func (s *UserStorageMock) UpdatePassword(ctx context.Context, username, password string) error {
-	args := s.Called(username, password)
-
-	return args.Error(0)
-}
-
-func (s *UserStorageMock) IsUserExistByUsername(ctx context.Context, username string) bool {
-	args := s.Called(username)
-
-	return args.Bool(0)
-}
-
-func (s *UserStorageMock) IsUserExistByEmail(ctx context.Context, email string) bool {
-	args := s.Called(email)
-
-	return args.Bool(0)
 }
