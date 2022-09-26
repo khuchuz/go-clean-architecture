@@ -65,7 +65,7 @@ Request to get JWT Token based on user credentials
 Do this :
 
 ```
-$ git clone https://github.com/teten-nugraha/golang-crud.git
+$ git clone https://github.com/khuchuz/go-clean-architecture
 $ go mod download
 $ go run main.go
 ```
