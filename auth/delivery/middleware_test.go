@@ -112,7 +112,7 @@ func Test_Middleware_Unauthorized5(t *testing.T) {
 
 	// Valid Auth Header
 	uc.On("ParseToken", "token").Return(&models.User{}, nil)
-	req.Header.Set("Authorization", "Yang jelas ini bukan token aslinya sih")
+	req.Header.Set("Authorization", "Bukan token")
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
