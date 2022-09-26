@@ -27,7 +27,7 @@ func (m *AuthUseCaseMock) SignIn(ctx context.Context, inp entities.SignInput) (s
 func (m *AuthUseCaseMock) ChangePassword(ctx context.Context, inp entities.ChangePasswordInput) error {
 	args := m.Called(inp.Username, inp.OldPassword, inp.Password)
 
-	return args.Error(1)
+	return args.Error(0)
 }
 
 func (m *AuthUseCaseMock) ParseToken(ctx context.Context, accessToken string) (*models.User, error) {

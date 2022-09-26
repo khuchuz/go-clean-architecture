@@ -1,1 +1,2 @@
+https://github.com/zhashkevych/go-clean-architecture
 https://github.com/victorneuret/mongo-go-driver-mock
