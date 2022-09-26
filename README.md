@@ -11,6 +11,8 @@ Example that shows core principles of the Clean Architecture in Golang projects.
 
 More on topic can be found <a href="https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html">here</a>.
 
+![clean](images/clean.jpg "clean")
+
 ### Project Description&Structure:
 REST API with custom JWT-based authentication system. Core functionality is about creating and managing bookmarks (Simple clone of <a href="https://app.getpocket.com/">Pocket</a>).
 
@@ -58,3 +60,12 @@ Request to get JWT Token based on user credentials
 
 ## Requirements
 - go 1.19.1
+
+## Setup
+Do this :
+
+```
+$ git clone https://github.com/teten-nugraha/golang-crud.git
+$ go mod download
+$ go run main.go
+```
