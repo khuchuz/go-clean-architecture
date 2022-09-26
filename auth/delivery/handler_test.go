@@ -38,6 +38,22 @@ func TestSignUp_Success_200(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 }
+
+func TestSignUp_Failed_400(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	RegisterHTTPEndpoints(r, uc)
+
+	body, err := json.Marshal("not json")
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/sign-up", bytes.NewBuffer(body))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 400, w.Code)
+}
 func TestSignUp_Failed_500(t *testing.T) {
 	r := gin.Default()
 	uc := new(mock.AuthUseCaseMock)
@@ -83,6 +99,22 @@ func TestSignIn_Sucess_200(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, "{\"token\":\"jwt\"}", w.Body.String())
+}
+
+func TestSignIn_Failed_400(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	RegisterHTTPEndpoints(r, uc)
+
+	body, err := json.Marshal("not json")
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/sign-in", bytes.NewBuffer(body))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 400, w.Code)
 }
 func TestSignIn_ErrUserNotFound(t *testing.T) {
 	r := gin.Default()
@@ -205,4 +237,20 @@ func TestChangePassword_Success(t *testing.T) {
 
 	assert.Equal(t, 200, w.Code)
 	assert.Equal(t, "{\"message\":\"Password berhasil diubah\"}", w.Body.String())
+}
+
+func TestChangePassword_Failed_400(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	RegisterHTTPEndpoints(r, uc)
+
+	body, err := json.Marshal("not json")
+	assert.NoError(t, err)
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/auth/change-pass", bytes.NewBuffer(body))
+	r.ServeHTTP(w, req)
+
+	assert.Equal(t, 400, w.Code)
 }

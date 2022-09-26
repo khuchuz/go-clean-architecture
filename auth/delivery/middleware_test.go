@@ -12,7 +12,25 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestAuthMiddleware(t *testing.T) {
+func Test_Middleware_Success(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	r.POST("/api/endpoint", NewAuthMiddleware(uc), func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
+
+	// Valid Auth Header
+	uc.On("ParseToken", "token").Return(&models.User{}, nil)
+	req.Header.Set("Authorization", "Bearer token")
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusOK, w.Code)
+}
+
+func Test_Middleware_Unauthorized1(t *testing.T) {
 	r := gin.Default()
 	uc := new(mock.AuthUseCaseMock)
 
@@ -26,27 +44,75 @@ func TestAuthMiddleware(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
 
+func Test_Middleware_Unauthorized2(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	r.POST("/api/endpoint", NewAuthMiddleware(uc), func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
 	// Empty Auth Header request
-	w = httptest.NewRecorder()
 
 	req.Header.Set("Authorization", "")
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
 
+func Test_Middleware_Unauthorized3(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	r.POST("/api/endpoint", NewAuthMiddleware(uc), func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
 	// Bearer Auth Header with no token request
-	w = httptest.NewRecorder()
 	uc.On("ParseToken", "").Return(&models.User{}, auth.ErrInvalidAccessToken)
 
 	req.Header.Set("Authorization", "Bearer ")
 	r.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func Test_Middleware_Unauthorized4(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	r.POST("/api/endpoint", NewAuthMiddleware(uc), func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
 
 	// Valid Auth Header
-	w = httptest.NewRecorder()
 	uc.On("ParseToken", "token").Return(&models.User{}, nil)
-
-	req.Header.Set("Authorization", "Bearer token")
+	req.Header.Set("Authorization", "Bearer token ")
 	r.ServeHTTP(w, req)
-	assert.Equal(t, http.StatusOK, w.Code)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
+}
+
+func Test_Middleware_Unauthorized5(t *testing.T) {
+	r := gin.Default()
+	uc := new(mock.AuthUseCaseMock)
+
+	r.POST("/api/endpoint", NewAuthMiddleware(uc), func(c *gin.Context) {
+		c.Status(http.StatusOK)
+	})
+
+	w := httptest.NewRecorder()
+	req, _ := http.NewRequest("POST", "/api/endpoint", nil)
+
+	// Valid Auth Header
+	uc.On("ParseToken", "token").Return(&models.User{}, nil)
+	req.Header.Set("Authorization", "Yang jelas ini bukan token aslinya sih")
+	r.ServeHTTP(w, req)
+	assert.Equal(t, http.StatusUnauthorized, w.Code)
 }
