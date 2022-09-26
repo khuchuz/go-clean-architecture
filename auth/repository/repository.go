@@ -69,10 +69,7 @@ func (r UserRepository) IsUserExistByUsername(ctx context.Context, username stri
 		"username": username,
 	}).Decode(user)
 
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func (r UserRepository) IsUserExistByEmail(ctx context.Context, email string) bool {
@@ -81,10 +78,7 @@ func (r UserRepository) IsUserExistByEmail(ctx context.Context, email string) bo
 		"email": email,
 	}).Decode(user)
 
-	if err != nil {
-		return false
-	}
-	return true
+	return err == nil
 }
 
 func toMongoUser(u *models.User) *User {

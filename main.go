@@ -1,4 +1,4 @@
-package server
+package main
 
 import (
 	"context"
@@ -12,21 +12,23 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/khuchuz/go-clean-architecture/bookmark"
-
 	authhttp "github.com/khuchuz/go-clean-architecture/auth/delivery"
 	itface "github.com/khuchuz/go-clean-architecture/auth/itface"
 	authmongo "github.com/khuchuz/go-clean-architecture/auth/repository"
 	authusecase "github.com/khuchuz/go-clean-architecture/auth/usecase"
-	bmhttp "github.com/khuchuz/go-clean-architecture/bookmark/delivery"
-	bmmongo "github.com/khuchuz/go-clean-architecture/bookmark/repository"
-	bmusecase "github.com/khuchuz/go-clean-architecture/bookmark/usecase"
 )
+
+func main() {
+
+	app := NewApp()
+
+	if err := app.Run("8000"); err != nil {
+		log.Fatalf("%s", err.Error())
+	}
+}
 
 type App struct {
 	httpServer *http.Server
-
-	bookmarkUC bookmark.UseCase
 	authUC     itface.UseCase
 }
 
@@ -34,10 +36,8 @@ func NewApp() *App {
 	db := initDB()
 
 	userRepo := authmongo.NewUserRepository(db, "users")
-	bookmarkRepo := bmmongo.NewBookmarkRepository(db, "bookmarks")
 
 	return &App{
-		bookmarkUC: bmusecase.NewBookmarkUseCase(bookmarkRepo),
 		authUC: authusecase.NewAuthUseCase(
 			userRepo,
 			"hash_salt",
@@ -56,14 +56,18 @@ func (a *App) Run(port string) error {
 	)
 
 	// Set up http handlers
-	// SignUp/SignIn endpoints
-	authhttp.RegisterHTTPEndpoints(router, a.authUC)
+	h := authhttp.NewHandler(a.authUC)
+
+	authEndpoints := router.Group("/auth")
+	{
+		authEndpoints.POST("/sign-up", h.SignUp)
+		authEndpoints.POST("/sign-in", h.SignIn)
+		authEndpoints.POST("/change-pass", h.ChangePassword)
+	}
 
 	// API endpoints
 	authMiddleware := authhttp.NewAuthMiddleware(a.authUC)
-	api := router.Group("/api", authMiddleware)
-
-	bmhttp.RegisterHTTPEndpoints(api, a.bookmarkUC)
+	_ = router.Group("/api", authMiddleware)
 
 	// HTTP Server
 	a.httpServer = &http.Server{
